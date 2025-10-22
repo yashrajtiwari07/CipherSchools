@@ -21,12 +21,13 @@ const corsOptions = {
     const allowedOrigins = [
       process.env.CORS_ORIGIN || 'http://localhost:3000', // From environment variable
       'http://localhost:3000', // Local development
-      'http://127.0.0.1:3000'  // Alternative localhost
+      'http://127.0.0.1:3000', // Alternative localhost
+      'https://cipher-schools-six.vercel.app' // Production frontend (Vercel)
     ];
     
     // Add production domains in production environment
     if (process.env.NODE_ENV === 'production') {
-      allowedOrigins.push('https://yourdomain.com'); // Replace with actual domain
+      allowedOrigins.push('https://cipher-schools-six.vercel.app'); // Vercel deployment
     }
     
     // Check if origin is in allowed list
