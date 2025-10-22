@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FiPlus, 
-  FiSearch, 
-  FiFilter, 
-  FiGrid, 
-  FiList,
-  FiClock,
-  FiAlphaAZ,
-  FiCalendar,
-  FiFolder // ✅ Added missing import
+  FiSearch
 } from 'react-icons/fi';
 import { projectService } from '../../services/projectService';
 import { useAuth } from '../../hooks/useAuth';
@@ -24,8 +17,6 @@ const ProjectList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('lastOpened'); // lastOpened, name, createdAt
-  const [viewMode, setViewMode] = useState('grid'); // grid, list
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const { user } = useAuth();
@@ -35,29 +26,18 @@ const ProjectList = () => {
     loadProjects();
   }, []);
 
-  // Filter + sort projects
+  // Filter projects
   useEffect(() => {
     let filtered = projects.filter(project =>
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       project.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'createdAt':
-          return new Date(b.createdAt) - new Date(a.createdAt);
-        case 'lastOpened':
-        default:
-          const aDate = new Date(a.lastOpened || a.updatedAt);
-          const bDate = new Date(b.lastOpened || b.updatedAt);
-          return bDate - aDate;
-      }
-    });
+    // Sort by most recent
+    filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
     setFilteredProjects(filtered);
-  }, [projects, searchQuery, sortBy]);
+  }, [projects, searchQuery]);
 
   const loadProjects = async () => {
     try {
@@ -150,7 +130,7 @@ const ProjectList = () => {
       <div className="project-list-header">
         <div className="header-title">
           <h1>My Projects</h1>
-          <p>Welcome back, {user?.username}! You have {projects.length} projects.</p>
+          <p>{projects.length} projects</p>
         </div>
         
         <Button
@@ -161,83 +141,45 @@ const ProjectList = () => {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="project-filters">
-        <div className="search-bar">
-          <FiSearch className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search projects..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-        </div>
-
-        <div className="filter-controls">
-          <div className="sort-control">
-            <FiFilter className="filter-icon" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="sort-select"
-            >
-              <option value="lastOpened">Last Opened</option>
-              <option value="name">Name A-Z</option>
-              <option value="createdAt">Date Created</option>
-            </select>
-          </div>
-
-          <div className="view-controls">
-            <Button
-              variant={viewMode === 'grid' ? 'primary' : 'ghost'}
-              size="small"
-              onClick={() => setViewMode('grid')}
-              title="Grid View"
-            >
-              <FiGrid />
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'primary' : 'ghost'}
-              size="small"
-              onClick={() => setViewMode('list')}
-              title="List View"
-            >
-              <FiList />
-            </Button>
-          </div>
-        </div>
+      {/* Search */}
+      <div className="project-search">
+        <FiSearch className="search-icon" />
+        <input
+          type="text"
+          placeholder="Search projects..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
       </div>
 
-      {/* Project Cards */}
-      <div className={`projects-container ${viewMode}`}>
+      {/* Projects */}
+      <div className="projects-container">
         {filteredProjects.length > 0 ? (
-          filteredProjects.map(project => (
-            <ProjectCard
-              key={project._id}
-              project={project}
-              onEdit={setEditingProject}
-              onDelete={handleDeleteProject}
-              onDuplicate={handleDuplicateProject}
-            />
-          ))
+          <div className="projects-grid">
+            {filteredProjects.map(project => (
+              <ProjectCard
+                key={project._id}
+                project={project}
+                onEdit={setEditingProject}
+                onDelete={handleDeleteProject}
+                onDuplicate={handleDuplicateProject}
+              />
+            ))}
+          </div>
         ) : (
           <div className="empty-projects">
             {searchQuery ? (
               <div className="empty-search">
                 <h3>No projects found</h3>
-                <p>No projects match your search "{searchQuery}"</p>
-                <Button onClick={() => setSearchQuery('')}>Clear Search</Button>
+                <p>Try a different search term</p>
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-icon">
-                  <FiFolder size={64} />
-                </div>
                 <h3>No projects yet</h3>
-                <p>Create your first project to start building amazing applications</p>
-                <Button onClick={() => setShowCreateModal(true)} size="large">
-                  <FiPlus /> Create Your First Project
+                <p>Create your first project to get started</p>
+                <Button onClick={() => setShowCreateModal(true)}>
+                  <FiPlus /> Create Project
                 </Button>
               </div>
             )}

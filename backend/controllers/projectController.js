@@ -40,11 +40,6 @@ const generateProjectSlug = (name) => {
  * @returns { success, project }
  */
 const createProject = async (req, res) => {
-  // Start MongoDB transaction
-  // Purpose: Ensure all operations succeed or all fail (atomicity)
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     // Sanitize input data to prevent XSS attacks
     const sanitizedData = sanitizeProjectData(req.body);
@@ -53,8 +48,8 @@ const createProject = async (req, res) => {
     // Generate unique project slug for URL
     const projectSlug = generateProjectSlug(name);
 
-    // Create project in database (within transaction)
-    const [project] = await Project.create([{
+    // Create project in database
+    const project = await Project.create({
       userId: req.user._id, // Link to authenticated user
       name,
       description,
@@ -64,38 +59,35 @@ const createProject = async (req, res) => {
         autoSave: true, // Enable auto-save by default
         theme: 'light' // Light theme by default
       }
-    }], { session });
+    });
 
     // Create root folder (src/) for project files
-    const [rootFolder] = await File.create([{
+    const rootFolder = await File.create({
       projectId: project._id,
       name: 'src', // Root folder name
       type: 'folder',
       parentId: null // No parent (root level)
-    }], { session });
+    });
 
     // Link root folder to project
     project.rootFolderId = rootFolder._id;
-    await project.save({ session });
+    await project.save();
 
     // Create initial files based on framework template
     const template = frameworkTemplates[framework] || frameworkTemplates['react'];
     
     const filePromises = template.files.map(file => 
-      File.create([{
+      File.create({
         projectId: project._id,
         parentId: rootFolder._id,
         name: file.name,
         type: file.type,
         content: file.content,
         language: file.language
-      }], { session })
+      })
     );
     
     await Promise.all(filePromises);
-
-    // Commit transaction
-    await session.commitTransaction();
 
     res.status(201).json({
       success: true,
@@ -104,8 +96,6 @@ const createProject = async (req, res) => {
     });
 
   } catch (error) {
-    // Rollback transaction on error
-    await session.abortTransaction();
     console.error('Create project error:', error);
     
     res.status(500).json({
@@ -113,8 +103,6 @@ const createProject = async (req, res) => {
       message: 'Failed to create project',
       error: error.message
     });
-  } finally {
-    session.endSession();
   }
 };
 const getProjects = async (req, res) => {

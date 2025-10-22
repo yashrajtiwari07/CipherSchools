@@ -1,6 +1,6 @@
 /* Layout Components Styles */
 
-/* Header Styles */
+/* Header - Simplified */
 .app-header {
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border);
@@ -10,25 +10,14 @@
   height: 60px;
 }
 
-.app-header.ide-mode {
-  height: 48px;
-  background: var(--bg-secondary);
-}
-
 .header-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100%;
   padding: 0 1.5rem;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .brand-link {
@@ -51,25 +40,6 @@
 }
 
 .brand-text {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.ide-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.breadcrumb-separator {
-  color: var(--text-muted);
-}
-
-.current-project {
   color: var(--text-primary);
 }
 
@@ -84,25 +54,71 @@
   color: var(--text-secondary);
   font-weight: 500;
   transition: color 0.2s;
-  position: relative;
 }
 
 .nav-link:hover {
   color: var(--text-primary);
 }
 
-.nav-link.active {
-  color: var(--color-primary);
+.user-name {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
 }
 
-.nav-link.active::after {
-  content: '';
+/* Mobile Menu */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobile-nav {
   position: absolute;
-  bottom: -8px;
+  top: 100%;
   left: 0;
   right: 0;
-  height: 2px;
-  background: var(--color-primary);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: 0.75rem 0;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .header-nav {
+    display: none;
+  }
+  
+  .mobile-menu-toggle {
+    display: block;
+  }
 }
 
 .header-right {

@@ -1,16 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FiFolder, 
-  FiCalendar, 
-  FiClock, 
   FiMoreVertical, 
   FiEdit3, 
   FiTrash2, 
-  FiCopy, 
-  FiExternalLink,
-  FiCode,
-  FiUser
+  FiCopy
 } from 'react-icons/fi';
 import { formatDate } from '../../utils/helpers';
 import { FRAMEWORK_OPTIONS } from '../../utils/constants';
@@ -96,103 +90,58 @@ const ProjectCard = ({
       >
         <div className="project-card-header">
           <div className="project-info">
-            <div className="project-icon">
-              <FiFolder />
-            </div>
-            <div className="project-details">
-              <h3 className="project-name">{project.name}</h3>
-              <p className="project-slug">{project.projectSlug}</p>
-            </div>
+            <h3 className="project-name">{project.name}</h3>
+            <p className="project-description">
+              {project.description || 'No description'}
+            </p>
           </div>
           
-          <div className="project-menu">
-            <Button
-              variant="ghost"
-              size="small"
-              onClick={handleMenuClick}
-              className="menu-trigger"
-              aria-label="Project actions"
-            >
-              <FiMoreVertical />
-            </Button>
-            
-            {showMenu && (
-              <div className="project-menu-dropdown">
-                <button
-                  className="menu-item"
-                  onClick={(e) => handleActionClick('edit', e)}
-                >
-                  <FiEdit3 />
-                  <span>Edit Project</span>
-                </button>
-                <button
-                  className="menu-item"
-                  onClick={(e) => handleActionClick('duplicate', e)}
-                >
-                  <FiCopy />
-                  <span>Duplicate</span>
-                </button>
-                <div className="menu-divider" />
-                <button
-                  className="menu-item delete"
-                  onClick={(e) => handleActionClick('delete', e)}
-                >
-                  <FiTrash2 />
-                  <span>Delete</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="project-card-body">
-          <p className="project-description">
-            {project.description || 'No description provided.'}
-          </p>
-          
-          <div className="project-stats">
-            <div className="stat-item">
-              <FiCode size={14} />
-              <span>{project.fileCount || 0} files</span>
-            </div>
-            <div className="stat-item">
-              <FiClock size={14} />
-              <span>Modified {formatDate(project.updatedAt)}</span>
-            </div>
-          </div>
+          <Button
+            variant="ghost"
+            size="small"
+            onClick={handleMenuClick}
+            className="menu-trigger"
+            aria-label="Project actions"
+          >
+            <FiMoreVertical />
+          </Button>
         </div>
 
         <div className="project-card-footer">
-          <div className="project-framework">
-            <span className="framework-icon">
-              {getFrameworkIcon(project.settings?.framework)}
-            </span>
-            <span className="framework-label">
-              {getFrameworkLabel(project.settings?.framework)}
-            </span>
-          </div>
-          
-          <div className="project-dates">
-            <div className="date-item">
-              <FiCalendar size={12} />
-              <span>Created {formatDate(project.createdAt)}</span>
-            </div>
-            {project.lastOpened && (
-              <div className="date-item">
-                <FiExternalLink size={12} />
-                <span>Opened {formatDate(project.lastOpened)}</span>
-              </div>
-            )}
-          </div>
+          <span className="project-framework">
+            {getFrameworkLabel(project.settings?.framework)}
+          </span>
+          <span className="project-date">
+            {formatDate(project.updatedAt)}
+          </span>
         </div>
-
-        {project.isPublic && (
-          <div className="project-badge public">
-            <FiUser size={12} />
-            <span>Public</span>
-          </div>
-        )}
       </Link>
+
+      {showMenu && (
+        <div className="project-menu-dropdown">
+          <button
+            className="menu-item"
+            onClick={(e) => handleActionClick('edit', e)}
+          >
+            <FiEdit3 />
+            <span>Edit</span>
+          </button>
+          <button
+            className="menu-item"
+            onClick={(e) => handleActionClick('duplicate', e)}
+          >
+            <FiCopy />
+            <span>Copy</span>
+          </button>
+          <button
+            className="menu-item delete"
+            onClick={(e) => handleActionClick('delete', e)}
+          >
+            <FiTrash2 />
+            <span>Delete</span>
+          </button>
+        </div>
+      )}
 
       {/* Click outside to close menu */}
       {showMenu && (
